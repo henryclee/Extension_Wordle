@@ -8,10 +8,7 @@
         "scripting",
         "tabs",
         "webNavigation",
-        "webRequest",
-        "webRequestBlocking",
-        "http://*/*",
-        "https://*/*"
+        "webRequest"
     ],
     "action": {
       "default_popup": "popup.html",
