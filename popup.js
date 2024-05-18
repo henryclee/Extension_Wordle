@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         chrome.tabs.sendMessage(tabs[0].id, { action: "hint" }, (response) => {
           if (response && response.bestguess) {
-            document.getElementById('output').textContent = response.bestguess;
+            document.getElementById('output').textContent = response.bestguess + "\n" + response.possible;
           } else {
             document.getElementById('output').textContent = "No Clue found";
           }

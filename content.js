@@ -77,17 +77,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log(g);
         console.log(s);
 
-        if (s[0][0] == "e"){
-            sendResponse({ bestguess: "trace" });
-        }
 
         chrome.runtime.sendMessage({ action: 'filter', guesses: g, states: s }, (response) => {
             
             possibleAnswers = response.possibleAnswers;
             legalWords = response.legalWords;
 
+            if (s[0][0] == "e"){
+                sendResponse({ 
+                    bestguess: "First guess: trace or tares",
+                    possible: possibleAnswers.length.toString() + " possible answers",
+                });
+                return true;
+            }
+
             if (possibleAnswers.length == 2) {
-                sendResponse({bestguess: "50/50: " + possibleAnswers[0] + " or " + possibleAnswers[1]})
+                sendResponse({
+                    bestguess: "50/50 Chance, try your luck",
+                    possible: "Possible answers: " + possibleAnswers.toString()
+                })
+                return true;
             }
             
             console.log("possible answers: " + possibleAnswers.length)
@@ -103,15 +112,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 }
             }
 
-            console.log("sending response")
+            console.log("sending response");
 
-            sendResponse({ bestguess: bestguess });
+            possResponse = possibleAnswers.length.toString() + " possible answers";
+            if (possibleAnswers.length <= 10) {
+                possResponse = "Possible answers: " + possibleAnswers.slice(0,10).toString();
+            }
+
+            guessResponse = bestguess;
+            if (possibleAnswers.length == 1) {
+                guessResponse = "The answer is " + bestguess;
+                possResponse = "Possible answers: 1";
+            }
+
+            sendResponse({ 
+                bestguess: bestguess,
+                possible: possResponse
+            });
 
         });
-
         return true;
-
-        
     }
   });
   

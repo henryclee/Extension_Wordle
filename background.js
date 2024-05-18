@@ -72,10 +72,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         console.log(guesses);
         console.log(states);
+        console.log(guessrow);
 
         for (let r = guessrow; r < 6; r ++) {
             if (states[r][0] == "e") {
                 guessrow = r-1;
+                if (guessrow < 0) {
+                    guessrow = 0;
+                }
                 break;
             }
             tempcount = Array(26).fill(0);
@@ -160,4 +164,5 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({possibleAnswers: possibleAnswers, legalWords: legalWords});
 
     }
+    return true;
 });
