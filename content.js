@@ -1,19 +1,14 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "hint") {
-        console.log("Hint request received");
 
         function getGuesses() {
-
             guesses = Array(6);
             states = Array(6);
-
             for (let r = 0; r < 6; r++) {
                 guesses[r] = Array(5).fill("");
                 states[r] = Array(5).fill("e");
             }
-
             rowDivs = document.querySelectorAll('div.Row-module_row__pwpBq');
-
             for (let r = 0; r < 6; r++ ) {
                 tiles = rowDivs[r].querySelectorAll('div[aria-roledescription="tile"]');
                 if (tiles[0].getAttribute('data-state') == "empty") {
@@ -51,11 +46,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
 
         function findEntropy(guess, possibleAnswers) {
-
             histo = {}
             entropy = 0;
             denom = possibleAnswers.length
-            
             for (let answer of possibleAnswers) {
                 pattern = findPattern(guess, answer);
                 if (pattern == "ccccc") {
@@ -64,19 +57,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 histo[pattern] = (histo[pattern] ?? 0) + 1;
                 
             }
-
             for (let count of Object.values(histo)) {
                 entropy += count*Math.log2(denom/count);
             }
-
             return entropy
-
         }
 
         let [g, s] = getGuesses();
-        console.log(g);
-        console.log(s);
-
 
         chrome.runtime.sendMessage({ action: 'filter', guesses: g, states: s }, (response) => {
             
@@ -98,8 +85,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 })
                 return true;
             }
-            
-            console.log("possible answers: " + possibleAnswers.length)
 
             highestentropy = 0;
             bestguess = "";
@@ -111,8 +96,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     bestguess = guess;
                 }
             }
-
-            console.log("sending response");
 
             possResponse = possibleAnswers.length.toString() + " possible answers";
             if (possibleAnswers.length <= 10) {
@@ -129,7 +112,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 bestguess: bestguess,
                 possible: possResponse
             });
-
         });
         return true;
     }

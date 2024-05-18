@@ -11,8 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('output').textContent = "No Clue found";
           }
         });
-
-
       });
     });
   }

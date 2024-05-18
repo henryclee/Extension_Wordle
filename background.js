@@ -9,11 +9,7 @@ let guessrow = 0;
 chrome.webNavigation.onDOMContentLoaded.addListener((details) => {
     // Check if the URL matches the specific website
     if (details.url.startsWith("https://www.nytimes.com/games/wordle/index.html")) {
-        console.log('Wordle website loaded, loading dictionaries');
-        // Your code here
         var fileURL = chrome.runtime.getURL('Dictionary/legalWords.txt');
-
-        // Use fetch API to load the file
         fetch(fileURL)
             .then(response => {
                 if (!response.ok) {
@@ -22,10 +18,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener((details) => {
                 return response.text();
                 })
             .then(text => {
-                // Parse the file contents into an array
                 legalWords = text.split('\n');
-                // Store the dictionary array in a variable or use it as needed
-                console.log('legal Words array loaded');
             })
             .catch(error => {
                 console.error(error);
@@ -41,10 +34,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener((details) => {
                 return response.text();
                 })
             .then(text => {
-                // Parse the file contents into an array
                 possibleAnswers = text.split('\n');
-                // Store the dictionary array in a variable or use it as needed
-                console.log('Possible answers array loaded');
             })
             .catch(error => {
                 console.error(error);
@@ -59,8 +49,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // FILTER PossibleAnswers
     if (message.action === 'filter') {
 
-        console.log("filter message received, pre filter possible answers: " + possibleAnswers.length)
-
         guesses = message.guesses;
         states = message.states;
         
@@ -69,10 +57,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         count = Array(26).fill(0);
         absent = new Set();
         a = 97;
-
-        console.log(guesses);
-        console.log(states);
-        console.log(guessrow);
 
         for (let r = guessrow; r < 6; r ++) {
             if (states[r][0] == "e") {
@@ -109,12 +93,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             }
         }
 
-        console.log("correct: " + correct)
-        console.log("absent: ")
         for (let a of absent) {
             console.log(a);
         }
-        console.log("count: " + count)
 
         for (let i = 0; i < possibleAnswers.length; i++ ) {
 
@@ -125,15 +106,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 letter = possibleAnswers[i][c];
                 ord = letter.charCodeAt(0) - a;
                 if (correct[c] != "" &&  correct[c] != letter) {
-                    if (possibleAnswers[i] == "tutor") {
-                        console.log("excluded for correct letter")
-                    }
                     exclude = true;
                     break;
                 } else if (absent.has(letter)) {
-                    if (possibleAnswers[i] == "tutor") {
-                        console.log("excluded for absent letter")
-                    }
                     exclude = true;
                     break;
                 }
@@ -142,9 +117,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (!exclude) {
                 for (let c = 0; c < 26; c ++) {
                     if (count[c] > tempcount[c]) {
-                        if (possibleAnswers[i] == "tutor") {
-                            console.log("excluded for counts")
-                        }
                         exclude = true;
                         break;
                     }
@@ -154,15 +126,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 filterout.add(i)
             }
         }
-        console.log("filtering out : " + filterout.size)
         
         possibleAnswers = possibleAnswers.filter((_, index) => !filterout.has(index));
-        console.log("sending filtered answers, total: " + possibleAnswers.length)
         if (possibleAnswers.length < 5) {
             console.log(possibleAnswers)
         }
         sendResponse({possibleAnswers: possibleAnswers, legalWords: legalWords});
-
     }
     return true;
 });
