@@ -1,15 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const readHtmlButton = document.getElementById('read-html');
+  const readHtmlButton = document.getElementById('get-hint');
   if (readHtmlButton) {
     readHtmlButton.addEventListener('click', () => {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, { action: "getHTML" }, (response) => {
-          if (response && response.html) {
-            document.getElementById('output').textContent = response.html;
+
+        chrome.tabs.sendMessage(tabs[0].id, { action: "hint" }, (response) => {
+          if (response && response.bestguess) {
+            document.getElementById('output').textContent = response.bestguess;
           } else {
-            document.getElementById('output').textContent = "No HTML content retrieved.";
+            document.getElementById('output').textContent = "No Clue found";
           }
         });
+
+
       });
     });
   }

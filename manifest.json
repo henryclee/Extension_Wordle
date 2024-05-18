@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "HTML Reader Extension",
+    "name": "Wordle Hints",
     "version": "1.0",
-    "description": "A Chrome extension that reads content from a website's HTML.",
+    "description": "A Chrome extension that provides hints for Wordle.",
     "permissions": [
         "activeTab",
         "scripting",

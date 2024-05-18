@@ -1,20 +1,6 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "getHTML") {
-        console.log("getHTML request received");
-
-        // rowDivs = document.querySelectorAll('div.Row-module_row__pwpBq');
-        // rowDivs.forEach(rowdiv => {
-
-        //     tiles = rowdiv.querySelectorAll('div[aria-roledescription="tile"]');
-        //     tiles.forEach(tilediv => {
-        //         arialabel = tilediv.getAttribute('aria-label');
-        //         text = tilediv.textContent;
-        //         stat = tilediv.getAttribute('data-state')
-        //         console.log(arialabel);
-        //         console.log(text, stat);
-        //     })
-            
-        // })
+    if (request.action === "hint") {
+        console.log("Hint request received");
 
         function getGuesses() {
 
@@ -30,7 +16,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
             for (let r = 0; r < 6; r++ ) {
                 tiles = rowDivs[r].querySelectorAll('div[aria-roledescription="tile"]');
-                if (tiles[c].getAttribute('data-state') == "empty") {
+                if (tiles[0].getAttribute('data-state') == "empty") {
                     break;
                 } 
                 for (let c = 0; c < 5; c++) {
@@ -40,9 +26,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     states[r][c] = state[0]; // first letter of absent, present, or correct
                 }
             } 
-
             return [guesses, states]
-            
         }
 
         function findPattern(guess, answer) {
@@ -66,11 +50,68 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             return pattern.join("")
         }
 
+        function findEntropy(guess, possibleAnswers) {
+
+            histo = {}
+            entropy = 0;
+            denom = possibleAnswers.length
+            
+            for (let answer of possibleAnswers) {
+                pattern = findPattern(guess, answer);
+                if (pattern == "ccccc") {
+                    entropy = .000001
+                }
+                histo[pattern] = (histo[pattern] ?? 0) + 1;
+                
+            }
+
+            for (let count of Object.values(histo)) {
+                entropy += count*Math.log2(denom/count);
+            }
+
+            return entropy
+
+        }
+
         let [g, s] = getGuesses();
         console.log(g);
         console.log(s);
 
-        sendResponse({ html: document.documentElement.innerHTML });
+        if (s[0][0] == "e"){
+            sendResponse({ bestguess: "trace" });
+        }
+
+        chrome.runtime.sendMessage({ action: 'filter', guesses: g, states: s }, (response) => {
+            
+            possibleAnswers = response.possibleAnswers;
+            legalWords = response.legalWords;
+
+            if (possibleAnswers.length == 2) {
+                sendResponse({bestguess: "50/50: " + possibleAnswers[0] + " or " + possibleAnswers[1]})
+            }
+            
+            console.log("possible answers: " + possibleAnswers.length)
+
+            highestentropy = 0;
+            bestguess = "";
+            
+            for (let guess of legalWords) {
+                entropy = findEntropy(guess, possibleAnswers);
+                if (entropy > highestentropy) {
+                    highestentropy = entropy;
+                    bestguess = guess;
+                }
+            }
+
+            console.log("sending response")
+
+            sendResponse({ bestguess: bestguess });
+
+        });
+
+        return true;
+
+        
     }
   });
   
