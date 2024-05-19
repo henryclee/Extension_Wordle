@@ -40,6 +40,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener((details) => {
                 console.error(error);
             });
     }
+    guessrow = 0;
 });
 
 // Listen for messages from content scripts

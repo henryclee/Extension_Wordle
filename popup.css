@@ -1,13 +1,14 @@
 /* popup.css */
 body {
     font-family: Arial, sans-serif;
-    width: 200px;
+    width: 250px;
     height: 150px;
     padding: 10px;
   }
   
   h1 {
-    font-size: 20px;
+    font-size: 24px;
+    margin-top: 0;
   }
   
   button {
@@ -19,5 +20,6 @@ body {
     word-wrap: break-word;
     max-height: 300px;
     overflow: auto;
+    font-size: 14px;
   }
   

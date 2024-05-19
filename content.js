@@ -72,7 +72,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
             if (s[0][0] == "e"){
                 sendResponse({ 
-                    bestguess: "First guess: trace or tares",
+                    bestguess: "First guess: trace or crane",
                     possible: possibleAnswers.length.toString() + " possible answers",
                 });
                 return true;
