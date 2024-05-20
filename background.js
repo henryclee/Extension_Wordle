@@ -94,10 +94,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             }
         }
 
-        for (let a of absent) {
-            console.log(a);
-        }
-
         for (let i = 0; i < possibleAnswers.length; i++ ) {
 
             tempcount = Array(26).fill(0);
@@ -129,9 +125,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
         
         possibleAnswers = possibleAnswers.filter((_, index) => !filterout.has(index));
-        if (possibleAnswers.length < 5) {
-            console.log(possibleAnswers)
-        }
         sendResponse({possibleAnswers: possibleAnswers, legalWords: legalWords});
     }
     return true;
